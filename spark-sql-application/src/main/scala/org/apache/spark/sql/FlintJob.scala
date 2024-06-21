@@ -44,7 +44,7 @@ object FlintJob extends Logging with FlintJobExecutor {
         val key = keyValue(0).stripPrefix("--conf")
         val value = keyValue(1)
 
-        val keySuffix = key.trim.split(".").last
+        val keySuffix = key.trim.split("\\.").last
 
         CustomLogging.logInfo(s"""Setting the System property: $keySuffix: ${value.trim}""")
         System.setProperty(keySuffix, value.trim)
