@@ -485,14 +485,15 @@ trait FlintJobExecutor {
     }
   }
 
-  def parseArgs(args: Array[String]): (Option[String], String) = {
+  def parseArgs(args: Array[String]): (Option[String], String, String) = {
     args match {
-      case Array(resultIndex) =>
-        (None, resultIndex) // Starting from OS 2.13, resultIndex is the only argument
-      case Array(query, resultIndex) =>
+      case Array(resultIndex, params) =>
+        (None, resultIndex, params) // Starting from OS 2.13, resultIndex is the only argument
+      case Array(query, resultIndex, params) =>
         (
           Some(query),
-          resultIndex
+          resultIndex,
+          params
         ) // Before OS 2.13, there are two arguments, the second one is resultIndex
       case _ => logAndThrow("Unsupported number of arguments. Expected 1 or 2 arguments.")
     }

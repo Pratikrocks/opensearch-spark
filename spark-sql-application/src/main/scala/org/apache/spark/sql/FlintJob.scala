@@ -29,10 +29,33 @@ import org.apache.spark.sql.types._
  */
 object FlintJob extends Logging with FlintJobExecutor {
   def main(args: Array[String]): Unit = {
-    val (queryOption, resultIndex) = parseArgs(args)
+    val (queryOption, resultIndex, params) = parseArgs(args)
 
     val conf = createSparkConf()
     val jobType = conf.get("spark.flint.job.type", "batch")
+    CustomLogging.logInfo(s"""Job type is: ${jobType}""")
+    conf.set(FlintSparkConf.JOB_TYPE.key, jobType)
+
+    val options = params.split("\\s+")
+    // Iterate through each option and set it in the SparkConf object
+    options.foreach { option =>
+      val keyValue = option.split("=")
+      if (keyValue.length == 2) {
+        val key = keyValue(0).stripPrefix("--conf")
+        val value = keyValue(1)
+
+        val keySuffix = key.trim.split(".").last
+
+        CustomLogging.logInfo(s"""Setting the System property: $keySuffix: ${value.trim}""")
+        System.setProperty(keySuffix, value.trim)
+        conf.set(key.trim, value.trim)
+      } else {
+        // scalastyle:off println
+        println(s"Ignoring invalid option: $option") // Your println statement goes here
+        // scalastyle:on println
+      }
+    }
+
     CustomLogging.logInfo(s"""Job type is: ${jobType}""")
     conf.set(FlintSparkConf.JOB_TYPE.key, jobType)
 

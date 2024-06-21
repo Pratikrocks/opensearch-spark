@@ -65,7 +65,7 @@ object FlintREPL extends Logging with FlintJobExecutor {
   private val statementRunningCount = new AtomicInteger(0)
 
   def main(args: Array[String]) {
-    val (queryOption, resultIndex) = parseArgs(args)
+    val (queryOption, resultIndex, _) = parseArgs(args)
 
     if (Strings.isNullOrEmpty(resultIndex)) {
       logAndThrow("resultIndex is not set")
