@@ -45,10 +45,11 @@ object FlintJob extends Logging with FlintJobExecutor {
         val value = keyValue(1)
 
         val keySuffix = key.trim.split("\\.").last
-
         CustomLogging.logInfo(s"""Setting the System property: $keySuffix: ${value.trim}""")
         System.setProperty(keySuffix, value.trim)
         conf.set(key.trim, value.trim)
+        CustomLogging.logInfo(s"""Setting the Spark conf property: $keySuffix: ${value.trim}""")
+        conf.set(keySuffix, value.trim)
       } else {
         // scalastyle:off println
         println(s"Ignoring invalid option: $option") // Your println statement goes here
