@@ -8,6 +8,8 @@ package org.apache.spark.sql
 
 import java.util.concurrent.atomic.AtomicInteger
 
+import scala.sys.process.Process
+
 import org.opensearch.flint.core.logging.CustomLogging
 import org.opensearch.flint.core.metrics.MetricConstants
 import org.opensearch.flint.core.metrics.MetricsUtil.registerGauge
@@ -48,6 +50,17 @@ object FlintJob extends Logging with FlintJobExecutor {
         CustomLogging.logInfo(s"""Setting the System property: $keySuffix: ${value.trim}""")
         System.setProperty(keySuffix, value.trim)
         conf.set(key.trim, value.trim)
+        Process(Seq("bash", "-c", s"echo $keySuffix"), None, keySuffix -> value.trim).!
+        Process(Seq("bash", "-c", s"""export $keySuffix="${value.trim}"""", s"echo $keySuffix")).!
+        CustomLogging.logInfo(s"""logging the value of system variable
+             | [sys.env]: $keySuffix: ${sys.env.getOrElse(
+                                  keySuffix,
+                                  "NOT_YET_SET")}""".stripMargin)
+        CustomLogging.logInfo(s"""logging the value of system variable
+             | [System.getEnv]: $keySuffix: ${System
+                                  .getenv()
+                                  .getOrDefault(keySuffix, "NOT_YET_SET")}""".stripMargin)
+
         CustomLogging.logInfo(s"""Setting the Spark conf property: $keySuffix: ${value.trim}""")
         conf.set(keySuffix, value.trim)
       } else {
